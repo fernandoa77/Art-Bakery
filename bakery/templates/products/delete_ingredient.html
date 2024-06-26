@@ -1,13 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}Edit Ingredient{% endblock %}
+{% block title %}Delete Ingredient{% endblock %}
 
 {% block content %}
-    <h2>Edit Ingredient</h2>
+    <h2>Are you sure you want to delete "{{ ingredient.name }}"?</h2>
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="submit" class="btn btn-danger">Delete</button>
         <a href="{% url 'ingredients' bakery.id %}" class="btn btn-secondary">Cancel</a>
     </form>
 {% endblock %}

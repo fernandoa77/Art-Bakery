@@ -1,155 +1,36 @@
 {% extends "base.html" %}
+{% load custom_filters %}
 
 {% block title %}Ingredients{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Ingredients</h2>
-    <button class="btn btn-success" data-toggle="modal" data-target="#addIngredientModal">Add</button>
-</div>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th scope="col">Name</th>
-            <th scope="col">Quantity</th>
-            <th scope="col">Unit Type</th>
-            <th scope="col">Cost</th>
-            <th scope="col">Cost per Unit</th>
-            <th scope="col">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for ingredient in ingredients %}
-        <tr>
-            <td>{{ ingredient.name }}</td>
-            <td>{{ ingredient.quantity }}</td>
-            <td>{{ ingredient.unit }}</td>
-            <td>${{ ingredient.cost }}</td>
-            <td>${{ ingredient.cost|divisibleby:ingredient.quantity }}</td>
-            <td>
-                <button class="btn btn-primary btn-sm edit-btn" data-id="{{ ingredient.id }}" data-toggle="modal" data-target="#editIngredientModal">Edit</button>
-                <button class="btn btn-danger btn-sm delete-btn" data-id="{{ ingredient.id }}">Delete</button>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<!-- Add Ingredient Modal -->
-<div class="modal fade" id="addIngredientModal" tabindex="-1" role="dialog" aria-labelledby="addIngredientModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addIngredientModalLabel">Add Ingredient</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="addIngredientForm">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    <button type="submit" class="btn btn-success">Add Ingredient</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Edit Ingredient Modal -->
-<div class="modal fade" id="editIngredientModal" tabindex="-1" role="dialog" aria-labelledby="editIngredientModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editIngredientModalLabel">Edit Ingredient</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="editIngredientForm">
-                    {% csrf_token %}
-                    <div id="editIngredientFormContent">
-                        <!-- Form content will be loaded here via AJAX -->
-                    </div>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    $(document).ready(function() {
-        // Handle Add Ingredient form submission
-        $('#addIngredientForm').submit(function(event) {
-            event.preventDefault();
-            $.ajax({
-                url: "{% url 'add_ingredient' bakery.id %}",
-                method: "POST",
-                data: $(this).serialize(),
-                success: function(response) {
-                    if (response.status == 'success') {
-                        location.reload();
-                    } else {
-                        // Handle errors
-                    }
-                }
-            });
-        });
-
-        // Handle Edit Ingredient button click
-        $('.edit-btn').click(function() {
-            var ingredientId = $(this).data('id');
-            var editUrl = "{% url 'edit_ingredient' bakery.id 0 %}".replace('/0/', '/' + ingredientId + '/');
-            $.ajax({
-                url: editUrl,
-                method: "GET",
-                success: function(response) {
-                    $('#editIngredientFormContent').html(response);
-                    $('#editIngredientModal').modal('show');
-                }
-            });
-        });
-
-        // Handle Edit Ingredient form submission
-        $('#editIngredientForm').submit(function(event) {
-            event.preventDefault();
-            var ingredientId = $('#editIngredientFormContent').find('input[name="id"]').val();
-            var editUrl = "{% url 'edit_ingredient' bakery.id 0 %}".replace('/0/', '/' + ingredientId + '/');
-            $.ajax({
-                url: editUrl,
-                method: "POST",
-                data: $(this).serialize(),
-                success: function(response) {
-                    if (response.status == 'success') {
-                        location.reload();
-                    } else {
-                        // Handle errors
-                    }
-                }
-            });
-        });
-
-        // Handle Delete Ingredient button click
-        $('.delete-btn').click(function() {
-            var ingredientId = $(this).data('id');
-            var deleteUrl = "{% url 'delete_ingredient' bakery.id 0 %}".replace('/0/', '/' + ingredientId + '/');
-            $.ajax({
-                url: deleteUrl,
-                method: "POST",
-                data: {
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-                },
-                success: function(response) {
-                    if (response.status == 'success') {
-                        location.reload();
-                    } else {
-                        // Handle errors
-                    }
-                }
-            });
-        });
-    });
-</script>
+    <h2>Ingredients for {{ bakery.name }}</h2>
+    <a href="{% url 'add_ingredient' bakery.id %}" class="btn btn-success float-right">Add Ingredient</a>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Quantity</th>
+                <th>Unit Type</th>
+                <th>Cost</th>
+                <th>Cost per Unit</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ingredient in ingredients %}
+            <tr>
+                <td>{{ ingredient.name }}</td>
+                <td>{{ ingredient.quantity }}</td>
+                <td>{{ ingredient.unit }}</td>
+                <td>{{ ingredient.cost }}</td>
+                <td>{{ ingredient.cost|div:ingredient.quantity }}</td>
+                <td>
+                    <a href="{% url 'edit_ingredient' bakery.id ingredient.id %}" class="btn btn-primary">Edit</a>
+                    <a href="{% url 'delete_ingredient' bakery.id ingredient.id %}" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
