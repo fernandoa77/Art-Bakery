@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}My Bakery{% endblock %}
+{% block title %}{{ bakery.name }}{% endblock %}
 
 {% block content %}
-    <h1>Esta es la página de {{ username }}</h1>
+    <h1>Esta es la página de {{ bakery.name }}</h1>
 {% endblock %}

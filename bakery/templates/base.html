@@ -36,8 +36,8 @@
                         Orders
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownOrders">
-                        <a class="dropdown-item" href="{% url 'add_order' request.user.username %}">Add Order</a>
-                        <a class="dropdown-item" href="{% url 'order_log' request.user.username %}">Order Log</a>
+                        <a class="dropdown-item" href="{% url 'add_order' bakery.id %}">Add Order</a>
+                        <a class="dropdown-item" href="{% url 'order_log' bakery.id %}">Order Log</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -45,10 +45,10 @@
                         Product Creation
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownProductCreation">
-                        <a class="dropdown-item" href="{% url 'ingredients' request.user.username %}">Ingredients</a>
-                        <a class="dropdown-item" href="{% url 'recipes' request.user.username %}">Recipes</a>
-                        <a class="dropdown-item" href="{% url 'materials' request.user.username %}">Materials</a>
-                        <a class="dropdown-item" href="{% url 'packages' request.user.username %}">Packages</a>
+                        <a class="dropdown-item" href="{% url 'ingredients' bakery.id %}">Ingredients</a>
+                        <a class="dropdown-item" href="{% url 'recipes' bakery.id %}">Recipes</a>
+                        <a class="dropdown-item" href="{% url 'materials' bakery.id %}">Materials</a>
+                        <a class="dropdown-item" href="{% url 'packages' bakery.id %}">Packages</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -56,9 +56,9 @@
                         Expenses
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownExpenses">
-                        <a class="dropdown-item" href="{% url 'labor_costs' request.user.username %}">Labor Costs</a>
-                        <a class="dropdown-item" href="{% url 'fixed_expenses' request.user.username %}">Fixed Expenses</a>
-                        <a class="dropdown-item" href="{% url 'variable_expenses' request.user.username %}">Variable Expenses</a>
+                        <a class="dropdown-item" href="{% url 'labor_costs' bakery.id %}">Labor Costs</a>
+                        <a class="dropdown-item" href="{% url 'fixed_expenses' bakery.id %}">Fixed Expenses</a>
+                        <a class="dropdown-item" href="{% url 'variable_expenses' bakery.id %}">Variable Expenses</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -66,16 +66,16 @@
                         Reports
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownReports">
-                        <a class="dropdown-item" href="{% url 'expense_report' request.user.username %}">Expense Report</a>
-                        <a class="dropdown-item" href="{% url 'sales_report' request.user.username %}">Sales Report</a>
-                        <a class="dropdown-item" href="{% url 'financial_overview' request.user.username %}">Financial Overview</a>
+                        <a class="dropdown-item" href="{% url 'expense_report' bakery.id %}">Expense Report</a>
+                        <a class="dropdown-item" href="{% url 'sales_report' bakery.id %}">Sales Report</a>
+                        <a class="dropdown-item" href="{% url 'financial_overview' bakery.id %}">Financial Overview</a>
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'customers' request.user.username %}">Customers</a>
+                    <a class="nav-link" href="{% url 'customers' bakery.id %}">Customers</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'configuration' request.user.username %}">Bakery Config</a>
+                    <a class="nav-link" href="{% url 'configuration' bakery.id %}">Bakery Config</a>
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto">
