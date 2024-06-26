@@ -1,6 +1,9 @@
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.template.loader import render_to_string
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .forms import IngredientForm
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseForbidden
 from .models import Bakery, Ingredient
@@ -50,7 +53,8 @@ def order_log(request, bakery_id):
     else:
         return HttpResponseForbidden("You are not allowed to view this page.")
 
-# Product creation views
+# PRODUCT CREATION
+# ingredients
 @login_required
 def ingredients(request, bakery_id):
     bakery = get_object_or_404(Bakery, id=bakery_id)
@@ -60,8 +64,55 @@ def ingredients(request, bakery_id):
         return render(request, 'products/ingredients.html', {'bakery': bakery, 'ingredients': ingredients})
     else:
         return HttpResponseForbidden("You are not allowed to view this page.")
+    
+@login_required
+@csrf_exempt
+def add_ingredient(request, bakery_id):
+    bakery = get_object_or_404(Bakery, id=bakery_id)
+    if request.method == 'POST':
+        form = IngredientForm(request.POST)
+        if form.is_valid():
+            ingredient = form.save(commit=False)
+            ingredient.bakery = bakery
+            ingredient.save()
+            return JsonResponse({'status': 'success'})
+        else:
+            return JsonResponse({'status': 'error', 'errors': form.errors})
+    else:
+        form = IngredientForm()
+    return render(request, 'products/add_ingredient.html', {'form': form})
+
+@login_required
+@csrf_exempt
+def edit_ingredient(request, bakery_id, ingredient_id):
+    bakery = get_object_or_404(Bakery, id=bakery_id)
+    ingredient = get_object_or_404(Ingredient, bakery=bakery, id=ingredient_id)
+    if request.method == 'POST':
+        form = IngredientForm(request.POST, instance=ingredient)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({'status': 'success'})
+        else:
+            return JsonResponse({'status': 'error', 'errors': form.errors})
+    else:
+        form = IngredientForm(instance=ingredient)
+        form_html = render_to_string('products/edit_ingredient_form.html', {'form': form})
+        return JsonResponse({'form_html': form_html})
+
+@login_required
+@csrf_exempt
+def delete_ingredient(request, bakery_id, ingredient_id):
+    bakery = get_object_or_404(Bakery, id=bakery_id)
+    ingredient = get_object_or_404(Ingredient, bakery=bakery, id=ingredient_id)
+    if request.method == 'POST':
+        ingredient.delete()
+        return JsonResponse({'status': 'success'})
+    else:
+        return JsonResponse({'status': 'error'})
 
 
+
+#recipes
 @login_required
 def recipes(request, bakery_id):
     bakery = get_object_or_404(Bakery, id=bakery_id)
