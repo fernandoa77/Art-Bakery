@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Order Log{% endblock %}
+
+{% block content %}
+    <h2>Order Log for {{ username }}</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Date</th>
+                <th>Customer</th>
+                <th>Items</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>{{ order.id }}</td>
+                <td>{{ order.date }}</td>
+                <td>{{ order.customer }}</td>
+                <td>{{ order.items }}</td>
+                <td>{{ order.status }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

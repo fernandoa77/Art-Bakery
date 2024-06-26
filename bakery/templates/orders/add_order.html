@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Add Order{% endblock %}
+
+{% block content %}
+    <h2>Add Order for {{ username }}</h2>
+    <!-- Form for adding order -->
+    <form method="post">
+        {% csrf_token %}
+        <!-- Add form fields here -->
+        <button type="submit" class="btn btn-primary">Add Order</button>
+    </form>
+{% endblock %}
