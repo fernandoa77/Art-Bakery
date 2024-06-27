@@ -1,13 +1,36 @@
 {% extends "base.html" %}
+{% load custom_filters %}
 
 {% block title %}Materials{% endblock %}
 
 {% block content %}
-    <h2>Materials for {{ bakery }}</h2>
-    <!-- Display list of materials -->
-    <ul>
-        {% for material in materials %}
-        <li>{{ material.name }}</li>
-        {% endfor %}
-    </ul>
+    <h2>Materials for {{ bakery.name }}</h2>
+    <a href="{% url 'add_material' bakery.id %}" class="btn btn-success float-right">Add Material</a>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Quantity</th>
+                <th>Unit Type</th>
+                <th>Cost</th>
+                <th>Cost per Unit</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for material in materials %}
+            <tr>
+                <td>{{ material.name }}</td>
+                <td>{{ material.quantity }}</td>
+                <td>{{ material.unit }}</td>
+                <td>{{ material.cost }}</td>
+                <td>{{ material.cost|div:material.quantity }}</td>
+                <td>
+                    <a href="{% url 'edit_material' bakery.id material.id %}" class="btn btn-primary">Edit</a>
+                    <a href="{% url 'delete_material' bakery.id material.id %}" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

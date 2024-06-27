@@ -1,15 +1,10 @@
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from .forms import IngredientForm
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseForbidden
-from .models import Bakery, Ingredient
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponseForbidden
-from .models import Bakery, Ingredient
-from .forms import IngredientForm
-from django.http import JsonResponse
+
+from .models import Bakery, Ingredient, Material
+from .forms import IngredientForm, MaterialForm 
 
 
 def admin_check(user):
@@ -114,6 +109,61 @@ def delete_ingredient(request, bakery_id, ingredient_id):
     else:
         return HttpResponseForbidden("You are not allowed to view this page.")
 
+#materials
+
+@login_required
+def materials(request, bakery_id):
+    bakery = get_object_or_404(Bakery, id=bakery_id)
+    if admin_check(request.user) or request.user == bakery.owner:
+        materials = Material.objects.filter(bakery=bakery)
+        return render(request, 'products/materials.html', {'bakery': bakery, 'materials': materials})
+    else:
+        return HttpResponseForbidden("You are not allowed to view this page.")
+
+@login_required
+def add_material(request, bakery_id):
+    bakery = get_object_or_404(Bakery, id=bakery_id)
+    if admin_check(request.user) or request.user == bakery.owner:
+        if request.method == 'POST':
+            form = MaterialForm(request.POST)
+            if form.is_valid():
+                material = form.save(commit=False)
+                material.bakery = bakery
+                material.save()
+                return redirect('materials', bakery_id=bakery.id)
+        else:
+            form = MaterialForm()
+        return render(request, 'products/add_material.html', {'form': form, 'bakery': bakery})
+    else:
+        return HttpResponseForbidden("You are not allowed to view this page.")
+
+@login_required
+def edit_material(request, bakery_id, material_id):
+    bakery = get_object_or_404(Bakery, id=bakery_id)
+    material = get_object_or_404(Material, id=material_id, bakery=bakery)
+    if admin_check(request.user) or request.user == bakery.owner:
+        if request.method == 'POST':
+            form = MaterialForm(request.POST, instance=material)
+            if form.is_valid():
+                form.save()
+                return redirect('materials', bakery_id=bakery.id)
+        else:
+            form = MaterialForm(instance=material)
+        return render(request, 'products/edit_material.html', {'form': form, 'bakery': bakery})
+    else:
+        return HttpResponseForbidden("You are not allowed to view this page.")
+
+@login_required
+def delete_material(request, bakery_id, material_id):
+    bakery = get_object_or_404(Bakery, id=bakery_id)
+    material = get_object_or_404(Material, id=material_id, bakery=bakery)
+    if admin_check(request.user) or request.user == bakery.owner:
+        if request.method == 'POST':
+            material.delete()
+            return redirect('materials', bakery_id=bakery.id)
+        return render(request, 'products/delete_material.html', {'material': material, 'bakery': bakery})
+    else:
+        return HttpResponseForbidden("You are not allowed to view this page.")
 
 
 
@@ -125,16 +175,6 @@ def recipes(request, bakery_id):
         # Placeholder for fetching recipes from the database
         recipes = []  # Replace with actual query to get recipes
         return render(request, 'products/recipes.html', {'bakery': bakery, 'recipes': recipes})
-    else:
-        return HttpResponseForbidden("You are not allowed to view this page.")
-
-@login_required
-def materials(request, bakery_id):
-    bakery = get_object_or_404(Bakery, id=bakery_id)
-    if admin_check(request.user) or request.user == bakery.owner:
-        # Placeholder for fetching materials from the database
-        materials = []  # Replace with actual query to get materials
-        return render(request, 'products/materials.html', {'bakery': bakery, 'materials': materials})
     else:
         return HttpResponseForbidden("You are not allowed to view this page.")
 
