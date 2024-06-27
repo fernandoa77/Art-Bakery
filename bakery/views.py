@@ -3,8 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseForbidden
 
-from .models import Bakery, Ingredient, Material
-from .forms import IngredientForm, MaterialForm 
+from .models import Bakery, Ingredient, Material, Labor
+from .forms import IngredientForm, MaterialForm , LaborForm
 
 
 def admin_check(user):
@@ -60,7 +60,7 @@ def ingredients(request, bakery_id):
     bakery = get_object_or_404(Bakery, id=bakery_id)
     if admin_check(request.user) or request.user == bakery.owner:
         ingredients = Ingredient.objects.filter(bakery=bakery)
-        return render(request, 'products/ingredients.html', {'bakery': bakery, 'ingredients': ingredients})
+        return render(request, 'products/ingredients/ingredients.html', {'bakery': bakery, 'ingredients': ingredients})
     else:
         return HttpResponseForbidden("You are not allowed to view this page.")
 
@@ -77,7 +77,7 @@ def add_ingredient(request, bakery_id):
                 return redirect('ingredients', bakery_id=bakery.id)
         else:
             form = IngredientForm()
-        return render(request, 'products/add_ingredient.html', {'form': form, 'bakery': bakery})
+        return render(request, 'products/ingredients/add_ingredient.html', {'form': form, 'bakery': bakery})
     else:
         return HttpResponseForbidden("You are not allowed to view this page.")
 
@@ -93,7 +93,7 @@ def edit_ingredient(request, bakery_id, ingredient_id):
                 return redirect('ingredients', bakery_id=bakery.id)
         else:
             form = IngredientForm(instance=ingredient)
-        return render(request, 'products/edit_ingredient.html', {'form': form, 'bakery': bakery})
+        return render(request, 'products/ingredients/edit_ingredient.html', {'form': form, 'bakery': bakery})
     else:
         return HttpResponseForbidden("You are not allowed to view this page.")
 
@@ -105,7 +105,7 @@ def delete_ingredient(request, bakery_id, ingredient_id):
         if request.method == 'POST':
             ingredient.delete()
             return redirect('ingredients', bakery_id=bakery.id)
-        return render(request, 'products/delete_ingredient.html', {'ingredient': ingredient, 'bakery': bakery})
+        return render(request, 'products/ingredients/delete_ingredient.html', {'ingredient': ingredient, 'bakery': bakery})
     else:
         return HttpResponseForbidden("You are not allowed to view this page.")
 
@@ -116,7 +116,7 @@ def materials(request, bakery_id):
     bakery = get_object_or_404(Bakery, id=bakery_id)
     if admin_check(request.user) or request.user == bakery.owner:
         materials = Material.objects.filter(bakery=bakery)
-        return render(request, 'products/materials.html', {'bakery': bakery, 'materials': materials})
+        return render(request, 'products/materials/materials.html', {'bakery': bakery, 'materials': materials})
     else:
         return HttpResponseForbidden("You are not allowed to view this page.")
 
@@ -133,7 +133,7 @@ def add_material(request, bakery_id):
                 return redirect('materials', bakery_id=bakery.id)
         else:
             form = MaterialForm()
-        return render(request, 'products/add_material.html', {'form': form, 'bakery': bakery})
+        return render(request, 'products/materials/add_material.html', {'form': form, 'bakery': bakery})
     else:
         return HttpResponseForbidden("You are not allowed to view this page.")
 
@@ -149,7 +149,7 @@ def edit_material(request, bakery_id, material_id):
                 return redirect('materials', bakery_id=bakery.id)
         else:
             form = MaterialForm(instance=material)
-        return render(request, 'products/edit_material.html', {'form': form, 'bakery': bakery})
+        return render(request, 'products/materials/edit_material.html', {'form': form, 'bakery': bakery})
     else:
         return HttpResponseForbidden("You are not allowed to view this page.")
 
@@ -161,7 +161,7 @@ def delete_material(request, bakery_id, material_id):
         if request.method == 'POST':
             material.delete()
             return redirect('materials', bakery_id=bakery.id)
-        return render(request, 'products/delete_material.html', {'material': material, 'bakery': bakery})
+        return render(request, 'products/materials/delete_material.html', {'material': material, 'bakery': bakery})
     else:
         return HttpResponseForbidden("You are not allowed to view this page.")
 
@@ -200,13 +200,62 @@ def customers(request, bakery_id):
         return HttpResponseForbidden("You are not allowed to view this page.")
 
 # Expenses views
+#labor
 @login_required
-def labor_costs(request, bakery_id):
+def labor_list(request, bakery_id):
     bakery = get_object_or_404(Bakery, id=bakery_id)
     if admin_check(request.user) or request.user == bakery.owner:
-        return render(request, 'expenses/labor_costs.html', {'bakery': bakery})
+        labor_list = Labor.objects.filter(bakery=bakery)
+        return render(request, 'expenses/labor/labor.html', {'bakery': bakery, 'labor_list': labor_list})
     else:
         return HttpResponseForbidden("You are not allowed to view this page.")
+
+@login_required
+def add_labor(request, bakery_id):
+    bakery = get_object_or_404(Bakery, id=bakery_id)
+    if admin_check(request.user) or request.user == bakery.owner:
+        if request.method == 'POST':
+            form = LaborForm(request.POST)
+            if form.is_valid():
+                labor = form.save(commit=False)
+                labor.bakery = bakery
+                labor.save()
+                return redirect('labor_list', bakery_id=bakery.id)
+        else:
+            form = LaborForm()
+        return render(request, 'expenses/labor/add_labor.html', {'form': form, 'bakery': bakery})
+    else:
+        return HttpResponseForbidden("You are not allowed to view this page.")
+
+@login_required
+def edit_labor(request, bakery_id, labor_id):
+    bakery = get_object_or_404(Bakery, id=bakery_id)
+    labor = get_object_or_404(Labor, id=labor_id, bakery=bakery)
+    if admin_check(request.user) or request.user == bakery.owner:
+        if request.method == 'POST':
+            form = LaborForm(request.POST, instance=labor)
+            if form.is_valid():
+                form.save()
+                return redirect('labor_list', bakery_id=bakery.id)
+        else:
+            form = LaborForm(instance=labor)
+        return render(request, 'expenses/labor/edit_labor.html', {'form': form, 'bakery': bakery})
+    else:
+        return HttpResponseForbidden("You are not allowed to view this page.")
+
+@login_required
+def delete_labor(request, bakery_id, labor_id):
+    bakery = get_object_or_404(Bakery, id=bakery_id)
+    labor = get_object_or_404(Labor, id=labor_id, bakery=bakery)
+    if admin_check(request.user) or request.user == bakery.owner:
+        if request.method == 'POST':
+            labor.delete()
+            return redirect('labor_list', bakery_id=bakery.id)
+        return render(request, 'expenses/labor/delete_labor.html', {'labor': labor, 'bakery': bakery})
+    else:
+        return HttpResponseForbidden("You are not allowed to view this page.")
+    
+#expenses
 
 @login_required
 def fixed_expenses(request, bakery_id):

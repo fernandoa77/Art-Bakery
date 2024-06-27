@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Add Labor{% endblock %}
+
+{% block content %}
+    <h2>Add Labor</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Save</button>
+        <a href="{% url 'labor_list' bakery.id %}" class="btn btn-secondary">Cancel</a>
+    </form>
+{% endblock %}

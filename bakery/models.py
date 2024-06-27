@@ -32,10 +32,10 @@ class Material(models.Model):
 
 class Labor(models.Model):
     bakery = models.ForeignKey(Bakery, on_delete=models.CASCADE, related_name='labor')
+    name = models.CharField(max_length=100)
     daily_hours = models.FloatField()
     days_worked = models.IntegerField()
-    monthly_salary = models.DecimalField(max_digits=10, decimal_places=2)
+    monthly_wage = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f"Labor for {self.bakery.name}"
-
+        return self.name

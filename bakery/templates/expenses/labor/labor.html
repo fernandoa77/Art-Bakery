@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+
+{% block title %}Labor Costs{% endblock %}
+
+{% block content %}
+    <h2>Labor Costs for {{ bakery.name }}</h2>
+    <a href="{% url 'add_labor' bakery.id %}" class="btn btn-success float-right">Add Labor</a>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Daily Hours</th>
+                <th>Working Days per Month</th>
+                <th>Monthly Worked Hours</th>
+                <th>Monthly Wage</th>
+                <th>Daily Wage</th>
+                <th>Hourly Wage</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for labor in labor_list %}
+            <tr>
+                <td>{{ labor.name }}</td>
+                <td>{{ labor.daily_hours }}</td>
+                <td>{{ labor.days_worked }}</td>
+                <td>{{ labor.daily_hours|times:labor.days_worked }}</td>
+                <td>{{ labor.monthly_wage }}</td>
+                <td>{{ labor.monthly_wage|div:labor.days_worked }}</td>
+                <td>
+                    {% with total_hours=labor.daily_hours|times:labor.days_worked %}
+                        {{ labor.monthly_wage|div:total_hours }}
+                    {% endwith %}
+                </td>
+                <td>
+                    <a href="{% url 'edit_labor' bakery.id labor.id %}" class="btn btn-primary">Edit</a>
+                    <a href="{% url 'delete_labor' bakery.id labor.id %}" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
