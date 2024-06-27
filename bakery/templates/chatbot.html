@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        /* Chatbot styles */
+        .chatbot-bubble {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #ffccdf;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .chatbot-bubble i {
+            font-size: 24px;
+            color: black;
+        }
+
+        .chatbot-frame {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 300px;
+            height: 400px;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            display: none;
+            flex-direction: column;
+        }
+
+        .chatbot-header {
+            background-color: #ffccdf;
+            padding: 10px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbot-header .close-button {
+            cursor: pointer;
+            font-size: 18px;
+            color: black;
+        }
+
+        .chatbot-body {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        .chatbot-footer {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+        }
+
+        .chatbot-footer input {
+            flex: 1;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .chatbot-footer button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            background-color: #ff66b2;
+            border: none;
+            border-radius: 5px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="chatbot-bubble" id="chatbotBubble">
+        <i class="fa fa-plus"></i>
+    </div>
+    <div class="chatbot-frame" id="chatbotFrame">
+        <div class="chatbot-header">
+            Chatbot
+            <span class="close-button" id="closeButton">&times;</span>
+        </div>
+        <div class="chatbot-body" id="chatbotBody">
+            <p>Hola! Cómo te puedo ayudar hoy?</p>
+        </div>
+        <div class="chatbot-footer">
+            <input type="text" id="chatbotInput" placeholder="Type a message...">
+            <button id="chatbotSend">Send</button>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Chatbot JavaScript -->
+    <script>
+        $(document).ready(function() {
+            $('#chatbotBubble').click(function() {
+                $('#chatbotFrame').toggle();
+            });
+
+            $('#closeButton').click(function() {
+                $('#chatbotFrame').hide();
+            });
+
+            $('#chatbotSend').click(function() {
+                var message = $('#chatbotInput').val();
+                if (message.trim() !== '') {
+                    $('#chatbotBody').append('<p>' + message + '</p>');
+                    $('#chatbotInput').val('');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
