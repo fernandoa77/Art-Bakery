@@ -1,5 +1,6 @@
 from django import forms
-from .models import Ingredient, Material, Labor
+from .models import Ingredient, Material, Labor, FixedExpense, VariableExpense
+from bootstrap_datepicker_plus.widgets import DatePickerInput
 
 class IngredientForm(forms.ModelForm):
     class Meta:
@@ -17,3 +18,20 @@ class LaborForm(forms.ModelForm):
     class Meta:
         model = Labor
         fields = ['name', 'daily_hours', 'days_worked', 'monthly_wage']
+
+
+
+
+class FixedExpenseForm(forms.ModelForm):
+    class Meta:
+        model = FixedExpense
+        fields = ['concept', 'monthly_cost']
+
+
+class VariableExpenseForm(forms.ModelForm):
+    class Meta:
+        model = VariableExpense
+        fields = ['concept', 'date', 'amount']
+        widgets = {
+            'date': DatePickerInput(format='%Y-%m-%d'),
+        }

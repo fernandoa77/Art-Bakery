@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+
+{% block title %}Overhead Expenses{% endblock %}
+
+{% block content %}
+    <h2>Overhead Expenses for {{ bakery.name }}</h2>
+
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Fixed Expenses</h3>
+            <a href="{% url 'add_fixed_expense' bakery.id %}" class="btn btn-success float-right">Add Fixed Expense</a>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Monthly Cost</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for expense in fixed_expenses %}
+                    <tr>
+                        <td>{{ expense.concept }}</td>
+                        <td>{{ expense.monthly_cost }}</td>
+                        <td>
+                            <a href="{% url 'edit_fixed_expense' bakery.id expense.id %}" class="btn btn-primary">Edit</a>
+                            <a href="{% url 'delete_fixed_expense' bakery.id expense.id %}" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col-md-6">
+            <h3>Variable Expenses</h3>
+            <a href="{% url 'add_variable_expense' bakery.id %}" class="btn btn-success float-right">Add Variable Expense</a>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for expense in variable_expenses %}
+                    <tr>
+                        <td>{{ expense.concept }}</td>
+                        <td>{{ expense.date }}</td>
+                        <td>{{ expense.amount }}</td>
+                        <td>
+                            <a href="{% url 'edit_variable_expense' bakery.id expense.id %}" class="btn btn-primary">Edit</a>
+                            <a href="{% url 'delete_variable_expense' bakery.id expense.id %}" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

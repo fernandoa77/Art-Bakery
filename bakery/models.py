@@ -39,3 +39,20 @@ class Labor(models.Model):
 
     def __str__(self):
         return self.name
+
+class FixedExpense(models.Model):
+    bakery = models.ForeignKey(Bakery, on_delete=models.CASCADE, related_name='fixed_expenses')
+    concept = models.CharField(max_length=100)
+    monthly_cost = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return self.concept
+
+class VariableExpense(models.Model):
+    bakery = models.ForeignKey(Bakery, on_delete=models.CASCADE, related_name='variable_expenses')
+    concept = models.CharField(max_length=100)
+    date = models.DateField()
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return self.concept

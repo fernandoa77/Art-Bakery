@@ -3,8 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseForbidden
 
-from .models import Bakery, Ingredient, Material, Labor
-from .forms import IngredientForm, MaterialForm , LaborForm
+from .models import Bakery, Ingredient, Material, Labor, FixedExpense, VariableExpense
+from .forms import IngredientForm, MaterialForm , LaborForm, FixedExpenseForm, VariableExpenseForm
 
 
 def admin_check(user):
@@ -255,23 +255,93 @@ def delete_labor(request, bakery_id, labor_id):
     else:
         return HttpResponseForbidden("You are not allowed to view this page.")
     
-#expenses
+#overhead expenses
 
 @login_required
-def fixed_expenses(request, bakery_id):
+def overhead_expenses(request, bakery_id):
     bakery = get_object_or_404(Bakery, id=bakery_id)
     if admin_check(request.user) or request.user == bakery.owner:
-        return render(request, 'expenses/fixed_expenses.html', {'bakery': bakery})
+        fixed_expenses = FixedExpense.objects.filter(bakery=bakery)
+        variable_expenses = VariableExpense.objects.filter(bakery=bakery)
+        return render(request, 'expenses/overhead/overhead.html', {
+            'bakery': bakery,
+            'fixed_expenses': fixed_expenses,
+            'variable_expenses': variable_expenses
+        })
     else:
         return HttpResponseForbidden("You are not allowed to view this page.")
 
 @login_required
-def variable_expenses(request, bakery_id):
+def add_fixed_expense(request, bakery_id):
     bakery = get_object_or_404(Bakery, id=bakery_id)
-    if admin_check(request.user) or request.user == bakery.owner:
-        return render(request, 'expenses/variable_expenses.html', {'bakery': bakery})
+    if request.method == 'POST':
+        form = FixedExpenseForm(request.POST)
+        if form.is_valid():
+            fixed_expense = form.save(commit=False)
+            fixed_expense.bakery = bakery
+            fixed_expense.save()
+            return redirect('overhead_expenses', bakery_id=bakery_id)
     else:
-        return HttpResponseForbidden("You are not allowed to view this page.")
+        form = FixedExpenseForm()
+    return render(request, 'expenses/overhead/add_fixed_expense.html', {'form': form, 'bakery': bakery})
+
+@login_required
+def edit_fixed_expense(request, bakery_id, expense_id):
+    bakery = get_object_or_404(Bakery, id=bakery_id)
+    fixed_expense = get_object_or_404(FixedExpense, id=expense_id, bakery=bakery)
+    if request.method == 'POST':
+        form = FixedExpenseForm(request.POST, instance=fixed_expense)
+        if form.is_valid():
+            form.save()
+            return redirect('overhead_expenses', bakery_id=bakery_id)
+    else:
+        form = FixedExpenseForm(instance=fixed_expense)
+    return render(request, 'expenses/overhead/edit_fixed_expense.html', {'form': form, 'bakery': bakery})
+
+@login_required
+def delete_fixed_expense(request, bakery_id, expense_id):
+    bakery = get_object_or_404(Bakery, id=bakery_id)
+    fixed_expense = get_object_or_404(FixedExpense, id=expense_id, bakery=bakery)
+    if request.method == 'POST':
+        fixed_expense.delete()
+        return redirect('overhead_expenses', bakery_id=bakery_id)
+    return render(request, 'expenses/overhead/delete_fixed_expense.html', {'fixed_expense': fixed_expense, 'bakery': bakery})
+
+@login_required
+def add_variable_expense(request, bakery_id):
+    bakery = get_object_or_404(Bakery, id=bakery_id)
+    if request.method == 'POST':
+        form = VariableExpenseForm(request.POST)
+        if form.is_valid():
+            variable_expense = form.save(commit=False)
+            variable_expense.bakery = bakery
+            variable_expense.save()
+            return redirect('overhead_expenses', bakery_id=bakery_id)
+    else:
+        form = VariableExpenseForm()
+    return render(request, 'expenses/overhead/add_variable_expense.html', {'form': form, 'bakery': bakery})
+
+@login_required
+def edit_variable_expense(request, bakery_id, expense_id):
+    bakery = get_object_or_404(Bakery, id=bakery_id)
+    variable_expense = get_object_or_404(VariableExpense, id=expense_id, bakery=bakery)
+    if request.method == 'POST':
+        form = VariableExpenseForm(request.POST, instance=variable_expense)
+        if form.is_valid():
+            form.save()
+            return redirect('overhead_expenses', bakery_id=bakery_id)
+    else:
+        form = VariableExpenseForm(instance=variable_expense)
+    return render(request, 'expenses/overhead/edit_variable_expense.html', {'form': form, 'bakery': bakery})
+
+@login_required
+def delete_variable_expense(request, bakery_id, expense_id):
+    bakery = get_object_or_404(Bakery, id=bakery_id)
+    variable_expense = get_object_or_404(VariableExpense, id=expense_id, bakery=bakery)
+    if request.method == 'POST':
+        variable_expense.delete()
+        return redirect('overhead_expenses', bakery_id=bakery_id)
+    return render(request, 'expenses/overhead/delete_variable_expense.html', {'variable_expense': variable_expense, 'bakery': bakery})
 
 # Reports views
 @login_required
