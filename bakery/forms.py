@@ -1,5 +1,5 @@
 from django import forms
-from .models import Ingredient, Material, Labor, FixedExpense, VariableExpense
+from .models import Ingredient, Material, Labor, FixedExpense, VariableExpense, Customer
 from bootstrap_datepicker_plus.widgets import DatePickerInput
 
 class IngredientForm(forms.ModelForm):
@@ -35,3 +35,8 @@ class VariableExpenseForm(forms.ModelForm):
         widgets = {
             'date': DatePickerInput(format='%Y-%m-%d'),
         }
+
+class CustomerForm(forms.ModelForm):
+    class Meta:
+        model = Customer
+        fields = ['name', 'address', 'phone', 'email', 'origin']

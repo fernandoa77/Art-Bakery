@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load bootstrap4 %}
+
+{% block title %}Edit Customer{% endblock %}
+
+{% block content %}
+<h2>Edit Customer for {{ bakery.name }}</h2>
+<form method="post">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    <button type="submit" class="btn btn-success">Save</button>
+    <a href="{% url 'customers_list' bakery.id %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

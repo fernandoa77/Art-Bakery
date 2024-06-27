@@ -23,7 +23,10 @@ urlpatterns = [
     #packages
     path('<int:bakery_id>/products/packages/', views.packages, name='packages'),
     #customers
-    path('<int:bakery_id>/customers/', views.customers, name='customers'),
+    path('<int:bakery_id>/customers/', views.customers, name='customers_list'),
+    path('<int:bakery_id>/customers/add/', views.add_customer, name='add_customer'),
+    path('<int:bakery_id>/customers/<int:customer_id>/edit/', views.edit_customer, name='edit_customer'),
+    path('<int:bakery_id>/customers/<int:customer_id>/delete/', views.delete_customer, name='delete_customer'),
     #expenses
     #labor
     path('<int:bakery_id>/labor/', views.labor_list, name='labor_list'),

@@ -56,3 +56,15 @@ class VariableExpense(models.Model):
 
     def __str__(self):
         return self.concept
+
+
+class Customer(models.Model):
+    bakery = models.ForeignKey(Bakery, on_delete=models.CASCADE, related_name='customers')
+    name = models.CharField(max_length=100)
+    address = models.CharField(max_length=255)
+    phone = models.CharField(max_length=15)
+    email = models.EmailField()
+    origin = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name

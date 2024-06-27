@@ -3,8 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseForbidden
 
-from .models import Bakery, Ingredient, Material, Labor, FixedExpense, VariableExpense
-from .forms import IngredientForm, MaterialForm , LaborForm, FixedExpenseForm, VariableExpenseForm
+from .models import Bakery, Ingredient, Material, Labor, FixedExpense, VariableExpense, Customer
+from .forms import IngredientForm, MaterialForm , LaborForm, FixedExpenseForm, VariableExpenseForm, CustomerForm
 
 
 def admin_check(user):
@@ -193,9 +193,53 @@ def packages(request, bakery_id):
 def customers(request, bakery_id):
     bakery = get_object_or_404(Bakery, id=bakery_id)
     if admin_check(request.user) or request.user == bakery.owner:
-        # Placeholder for fetching customers from the database
-        customers = []  # Replace with actual query to get customers
-        return render(request, 'customers.html', {'bakery': bakery, 'customers': customers})
+        customers = bakery.customers.all()
+        return render(request, 'customers/customers.html', {'bakery': bakery, 'customers': customers})
+    else:
+        return HttpResponseForbidden("You are not allowed to view this page.")
+
+@login_required
+def add_customer(request, bakery_id):
+    bakery = get_object_or_404(Bakery, id=bakery_id)
+    if admin_check(request.user) or request.user == bakery.owner:
+        if request.method == "POST":
+            form = CustomerForm(request.POST)
+            if form.is_valid():
+                customer = form.save(commit=False)
+                customer.bakery = bakery
+                customer.save()
+                return redirect('customers_list', bakery_id=bakery.id)
+        else:
+            form = CustomerForm()
+        return render(request, 'customers/add_customer.html', {'form': form, 'bakery': bakery})
+    else:
+        return HttpResponseForbidden("You are not allowed to view this page.")
+
+@login_required
+def edit_customer(request, bakery_id, customer_id):
+    bakery = get_object_or_404(Bakery, id=bakery_id)
+    customer = get_object_or_404(Customer, id=customer_id, bakery=bakery)
+    if admin_check(request.user) or request.user == bakery.owner:
+        if request.method == "POST":
+            form = CustomerForm(request.POST, instance=customer)
+            if form.is_valid():
+                form.save()
+                return redirect('customers_list', bakery_id=bakery.id)
+        else:
+            form = CustomerForm(instance=customer)
+        return render(request, 'customers/edit_customer.html', {'form': form, 'bakery': bakery})
+    else:
+        return HttpResponseForbidden("You are not allowed to view this page.")
+
+@login_required
+def delete_customer(request, bakery_id, customer_id):
+    bakery = get_object_or_404(Bakery, id=bakery_id)
+    customer = get_object_or_404(Customer, id=customer_id, bakery=bakery)
+    if admin_check(request.user) or request.user == bakery.owner:
+        if request.method == "POST":
+            customer.delete()
+            return redirect('customers_list', bakery_id=bakery.id)
+        return render(request, 'customers/delete_customer.html', {'customer': customer, 'bakery': bakery})
     else:
         return HttpResponseForbidden("You are not allowed to view this page.")
 
